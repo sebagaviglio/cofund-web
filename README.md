@@ -91,6 +91,34 @@ El formulario tiene un campo "honeypot" invisible (`_gotcha`). Si un bot lo
 completa (los humanos nunca lo ven), el servidor responde como si todo
 estuviera bien pero no manda el email. No requiere ningún captcha visible.
 
+## Favicon e imagen para compartir (Open Graph)
+
+Estos archivos van sueltos en la raíz del repo, al lado de `index.html`:
+
+```
+favicon.ico            → ícono clásico (multi-tamaño 16/32/48)
+favicon-32x32.png      → ícono para navegadores modernos
+apple-touch-icon.png   → ícono cuando alguien "agrega a inicio" en iOS
+icon-192.png           → ícono para Android/Chrome
+og-image.png           → la imagen que se ve al compartir el link (1200x630)
+```
+
+`index.html` ya los referencia en el `<head>` con rutas absolutas (`/favicon.ico`,
+etc.), así que simplemente con subir estos archivos a la raíz del repo y hacer
+push, Vercel los sirve automáticamente en esas rutas.
+
+Las redes sociales (WhatsApp, Facebook, LinkedIn, Twitter/X) necesitan que
+`og-image.png` esté en una URL pública real — por eso las metaetiquetas usan
+`https://cofund.ar/og-image.png` en vez de una ruta relativa. Si en algún
+momento cambiás de dominio, hay que actualizar esa URL en el `<head>` de
+`index.html` (buscá `cofund.ar` y reemplazalo).
+
+**Importante:** las redes sociales cachean la preview del link. Si actualizás
+`og-image.png` más adelante y no se ve el cambio, usá el
+[Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) o el
+[Twitter Card Validator](https://cards-dev.twitter.com/validator) y pegá tu
+URL — tienen un botón para forzar que vuelvan a buscar la imagen.
+
 ## Límite de archivo adjunto
 
 El campo de "adjuntar presentación" acepta hasta **3MB**. Es a propósito:
