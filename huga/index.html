@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cofund × Hüga — Propuesta de Desarrollo de Negocios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0A1628;
+    --slate:#51637D;
+    --slate-soft:#8497AE;
+    --mist:#EFF8FA;
+    --mist-deep:#E2F2F5;
+    --cyan:#5DE0E6;
+    --blue:#0B57B0;
+    --blue-deep:#072B57;
+    --white:#FFFFFF;
+    --aurora: linear-gradient(100deg, var(--cyan) 0%, var(--blue) 65%);
+    --aurora-deep: linear-gradient(100deg, var(--cyan) 0%, var(--blue-deep) 80%);
+    --font-head:'Bricolage Grotesque', sans-serif;
+    --font-body:'Plus Jakarta Sans', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+    --ease: cubic-bezier(.16,.84,.32,1);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--mist);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.5;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--cyan); color:var(--blue-deep); }
+  a{color:inherit;}
+  img{max-width:100%; display:block;}
+
+  h1,h2,h3{ font-family:var(--font-head); letter-spacing:-0.02em; font-weight:800; }
+  .eyebrow{
+    font-family:var(--font-mono); font-size:13px; font-weight:600;
+    letter-spacing:.14em; text-transform:uppercase;
+  }
+
+  /* ---------- layout helpers ---------- */
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 40px; }
+  section{ position:relative; }
+  .pad{ padding:160px 0; }
+  @media (max-width:768px){ .pad{ padding:96px 0; } .wrap{ padding:0 24px; } }
+
+  /* ---------- scroll progress ---------- */
+  #progress{
+    position:fixed; top:0; left:0; height:3px; width:0%;
+    background:var(--aurora); z-index:999; transition:width .08s linear;
+  }
+
+  /* ---------- side nav ---------- */
+  #dotnav{
+    position:fixed; right:28px; top:50%; transform:translateY(-50%);
+    z-index:900; display:flex; flex-direction:column; gap:16px;
+  }
+  #dotnav button{
+    width:9px; height:9px; border-radius:50%; border:1.5px solid var(--slate-soft);
+    background:transparent; cursor:pointer; padding:0; transition:all .3s var(--ease);
+  }
+  #dotnav button.active{ background:var(--blue); border-color:var(--blue); transform:scale(1.5); }
+  @media (max-width:900px){ #dotnav{ display:none; } }
+
+  /* ---------- reveal-on-scroll ---------- */
+  .reveal{ opacity:0; transform:translateY(28px); transition:opacity .8s var(--ease), transform .8s var(--ease); }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+  .reveal-scale{ opacity:0; transform:scale(.92); transition:opacity .9s var(--ease), transform .9s var(--ease); }
+  .reveal-scale.in{ opacity:1; transform:scale(1); }
+  @media (prefers-reduced-motion: reduce){
+    .reveal, .reveal-scale{ opacity:1 !important; transform:none !important; transition:none !important; }
+    html{ scroll-behavior:auto; }
+    *{ animation-duration:.001s !important; animation-iteration-count:1 !important; }
+  }
+
+  /* ================= HERO ================= */
+  #hero{
+    min-height:100vh; display:flex; flex-direction:column; justify-content:space-between;
+    background:var(--blue-deep); color:var(--white); overflow:hidden; padding:56px 0 64px;
+  }
+  #hero::before{
+    content:''; position:absolute; inset:0; z-index:0;
+    background:
+      radial-gradient(60% 50% at 82% 8%, rgba(93,224,230,.35), transparent 60%),
+      radial-gradient(50% 45% at 8% 92%, rgba(11,87,176,.55), transparent 60%);
+    animation: drift 16s ease-in-out infinite alternate;
+  }
+  @keyframes drift{
+    0%{ transform:translate(0,0) scale(1); }
+    100%{ transform:translate(-2%,2%) scale(1.06); }
+  }
+  .hero-top, .hero-bottom{ position:relative; z-index:2; }
+  .hero-top{ display:flex; justify-content:space-between; align-items:center; }
+  .brandline{ display:flex; align-items:center; gap:14px; }
+  .cut-mark{
+    width:11px; height:34px; background:var(--aurora);
+    clip-path:polygon(35% 0, 100% 0, 65% 100%, 0 100%);
+  }
+  .hero-mid{ position:relative; z-index:2; flex:1; display:flex; flex-direction:column; justify-content:center; }
+  .hero-kicker{ color:var(--cyan); opacity:0; animation: fadeUp .8s var(--ease) .1s forwards; }
+  .hero-title{
+    font-size:clamp(44px, 7.4vw, 108px); line-height:1.02; margin-top:22px; max-width:1050px;
+  }
+  .hero-title span{ display:block; overflow:hidden; }
+  .hero-title span b{
+    display:block; font-weight:800; transform:translateY(110%);
+    animation: lineUp .9s var(--ease) forwards;
+  }
+  .hero-title span:nth-child(1) b{ animation-delay:.15s; }
+  .hero-title span:nth-child(2) b{ animation-delay:.28s; }
+  .hero-title span:nth-child(3) b{ animation-delay:.41s; background:var(--aurora); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  @keyframes lineUp{ to{ transform:translateY(0); } }
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:translateY(0);} }
+  .hero-sub{
+    margin-top:36px; max-width:560px; font-size:19px; color:#C3D6EC; font-weight:400;
+    opacity:0; animation: fadeUp .8s var(--ease) .62s forwards;
+  }
+  .hero-bottom{ display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:24px;
+    opacity:0; animation: fadeUp .8s var(--ease) .78s forwards; }
+  .hero-meta{ display:flex; gap:48px; flex-wrap:wrap; }
+  .hero-meta div p:first-child{ font-family:var(--font-mono); font-size:11px; color:var(--slate-soft); letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px;}
+  .hero-meta div p:last-child{ font-size:15px; color:#DCE7F5; }
+  .scrollcue{ display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--slate-soft); }
+  .scrollcue .line{ width:1px; height:34px; background:var(--slate-soft); position:relative; overflow:hidden; }
+  .scrollcue .line::after{ content:''; position:absolute; top:-100%; left:0; width:100%; height:100%; background:var(--cyan); animation: pour 1.8s ease-in-out infinite; }
+  @keyframes pour{ 0%{ top:-100%; } 60%{ top:100%; } 100%{ top:100%; } }
+
+  /* ================= STAT / PROBLEM ================= */
+  #problema{ background:var(--mist); }
+  .sectionhead{ max-width:760px; }
+  .sectionhead h2{ font-size:clamp(32px,4.4vw,56px); line-height:1.08; margin-top:18px; color:var(--blue-deep); }
+  .cards3{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:64px; }
+  @media (max-width:860px){ .cards3{ grid-template-columns:1fr; } }
+  .stat-card{
+    background:var(--white); border-radius:4px; padding:44px 36px; position:relative;
+    border-top:3px solid var(--blue);
+  }
+  .stat-card.dark{ background:var(--blue-deep); border-top-color:var(--cyan); }
+  .stat-card .num{ font-family:var(--font-mono); font-weight:600; font-size:clamp(46px,6vw,72px); color:var(--blue); line-height:1; }
+  .stat-card.dark .num{ color:var(--cyan); }
+  .stat-card p.desc{ margin-top:18px; font-size:16.5px; color:var(--slate); line-height:1.55; }
+  .stat-card.dark p.desc{ color:#C3D6EC; }
+  .source-note{ margin-top:28px; font-size:13px; color:var(--slate-soft); }
+
+  /* ================= HUGA STATS STRIP ================= */
+  #huga{ background:var(--blue-deep); color:var(--white); }
+  #huga .sectionhead h2{ color:var(--white); }
+  #huga .eyebrow{ color:var(--cyan); }
+  #huga p.lead{ margin-top:24px; max-width:680px; color:#C3D6EC; font-size:18px; }
+  .statrow{ display:grid; grid-template-columns:repeat(4,1fr); gap:2px; margin-top:64px; background:rgba(255,255,255,.08); }
+  @media (max-width:860px){ .statrow{ grid-template-columns:repeat(2,1fr); } }
+  .statcell{ background:var(--blue-deep); padding:40px 28px; text-align:left; }
+  .statcell .num{ font-family:var(--font-mono); font-weight:600; font-size:clamp(34px,4.4vw,52px); color:var(--cyan); line-height:1; }
+  .statcell .lbl{ margin-top:12px; font-size:14.5px; color:#AFC3DC; line-height:1.4; }
+  .huga-award{ margin-top:56px; font-size:15px; color:var(--slate-soft); font-style:italic; max-width:720px; }
+
+  /* ================= OPORTUNIDAD ================= */
+  #oportunidad{ background:var(--mist); }
+  .opp-list{ margin-top:64px; display:flex; flex-direction:column; }
+  .opp-row{
+    display:grid; grid-template-columns:120px 1fr 1fr; gap:32px; align-items:start;
+    padding:36px 0; border-top:1px solid var(--mist-deep);
+  }
+  .opp-row:last-child{ border-bottom:1px solid var(--mist-deep); }
+  @media (max-width:760px){ .opp-row{ grid-template-columns:1fr; gap:10px; } }
+  .opp-row .tag{ font-family:var(--font-mono); font-size:12px; color:var(--blue); letter-spacing:.08em; text-transform:uppercase; padding-top:6px; }
+  .opp-row h3{ font-size:26px; }
+  .opp-row p{ color:var(--slate); font-size:16px; }
+
+  /* ================= STATEMENT / PROPUESTA ================= */
+  #propuesta{
+    background:var(--blue-deep); color:var(--white); padding:200px 0;
+    display:flex; align-items:center; position:relative; overflow:hidden;
+  }
+  #propuesta::before{
+    content:''; position:absolute; width:900px; height:900px; border-radius:50%;
+    background:radial-gradient(circle, rgba(93,224,230,.16), transparent 68%);
+    right:-260px; top:-260px;
+  }
+  .statement{ font-size:clamp(30px,4.6vw,58px); line-height:1.18; max-width:980px; font-family:var(--font-head); font-weight:700; position:relative; z-index:2; }
+  .statement em{ font-style:normal; background:var(--aurora); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .statement-cap{ margin-top:44px; font-size:19px; color:#C3D6EC; max-width:640px; position:relative; z-index:2; }
+
+  /* ================= ETAPAS (timeline sequential — numbering justified) ================= */
+  #etapas{ background:var(--mist); }
+  .timeline{ margin-top:72px; position:relative; }
+  .timeline-line{
+    position:absolute; left:34px; top:14px; bottom:14px; width:2px; background:var(--mist-deep);
+  }
+  .timeline-fill{ position:absolute; left:34px; top:14px; width:2px; height:0; background:var(--aurora); transition:height 1.2s var(--ease); }
+  .tstep{ position:relative; padding-left:96px; padding-bottom:64px; }
+  .tstep:last-child{ padding-bottom:0; }
+  .tstep .dot{
+    position:absolute; left:22px; top:2px; width:26px; height:26px; border-radius:50%;
+    background:var(--white); border:2px solid var(--blue); display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-size:11px; font-weight:600; color:var(--blue); z-index:2;
+  }
+  .tstep.done .dot{ background:var(--blue); color:var(--white); }
+  .tstep h3{ font-size:27px; }
+  .tstep p{ margin-top:12px; color:var(--slate); font-size:16px; max-width:640px; }
+
+  /* ================= MARCA ================= */
+  #marca{ background:var(--blue-deep); color:var(--white); }
+  #marca .eyebrow{ color:var(--cyan); }
+  #marca .sectionhead h2{ color:var(--white); }
+  .brandtable{ margin-top:64px; }
+  .brand-row{
+    display:grid; grid-template-columns:1fr 1.4fr 1.6fr 1fr; gap:28px; align-items:center;
+    padding:30px 0; border-top:1px solid rgba(255,255,255,.14);
+  }
+  .brand-row.head{ font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--slate-soft); border-top:none; padding-bottom:14px; }
+  .brand-row:last-child{ border-bottom:1px solid rgba(255,255,255,.14); }
+  @media (max-width:820px){ .brand-row{ grid-template-columns:1fr; gap:6px; padding:24px 0; } .brand-row.head{ display:none; } }
+  .brand-row .name{ font-family:var(--font-head); font-weight:700; font-size:21px; }
+  .brand-row.r-home .name{ color:var(--cyan); }
+  .brand-row.r-com .name{ color:var(--cyan); }
+  .brand-row.r-ind .name{ color:var(--cyan); }
+  .brand-row.r-store .name{ color:var(--cyan); }
+  .brand-row p{ color:#C3D6EC; font-size:15px; }
+  .brandnote{ margin-top:40px; font-size:13.5px; color:var(--slate-soft); max-width:640px; }
+
+  /* ================= UNIDADES (Home / Comercial / Industrial) ================= */
+  .unit{ padding:140px 0; }
+  .unit-head{ display:flex; align-items:baseline; gap:20px; flex-wrap:wrap; }
+  .unit-head h2{ font-size:clamp(34px,5vw,64px); }
+  .unit-head .tag2{ font-size:19px; color:var(--slate); font-family:var(--font-body); font-weight:500; }
+  .unit-grid{ margin-top:56px; display:grid; grid-template-columns:repeat(3,1fr); gap:2px; background:var(--mist-deep); }
+  @media (max-width:900px){ .unit-grid{ grid-template-columns:1fr; } }
+  .unit-col{ background:var(--white); padding:40px 34px; }
+  .unit-col h4{ font-family:var(--font-mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--blue); margin-bottom:20px; }
+  .unit-col ul{ list-style:none; display:flex; flex-direction:column; gap:14px; }
+  .unit-col li{ font-size:15.5px; color:var(--slate); line-height:1.5; padding-left:18px; position:relative; }
+  .unit-col li::before{ content:''; position:absolute; left:0; top:8px; width:7px; height:7px; background:var(--cyan); clip-path:polygon(35% 0,100% 0,65% 100%,0 100%); }
+
+  #home{ background:var(--mist); }
+  #home .unit-head h2{ color:var(--blue-deep); }
+
+  #comercial{ background:var(--white); }
+  #comercial .unit-head h2{ color:var(--blue-deep); }
+  #comercial .unit-col{ background:var(--mist); }
+
+  #industrial{ background:var(--blue-deep); color:var(--white); }
+  #industrial .unit-head h2{ color:var(--white); }
+  #industrial .unit-head .tag2{ color:#AFC3DC; }
+  #industrial .unit-col{ background:#0B3A6B; }
+  #industrial .unit-col h4{ color:var(--cyan); }
+  #industrial .unit-col li{ color:#C3D6EC; }
+
+  /* ================= CANALES / INSTITUCIONAL grid ================= */
+  #canales{ background:var(--mist); }
+  .grid4{ margin-top:64px; display:grid; grid-template-columns:repeat(4,1fr); gap:2px; background:var(--mist-deep); }
+  @media (max-width:980px){ .grid4{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:560px){ .grid4{ grid-template-columns:1fr; } }
+  .gcard{ background:var(--white); padding:38px 30px; min-height:220px; display:flex; flex-direction:column; gap:16px; }
+  .gcard .mark{ width:30px; height:30px; background:var(--aurora); clip-path:polygon(30% 0,100% 0,70% 100%,0 100%); }
+  .gcard h4{ font-size:19px; font-family:var(--font-head); font-weight:700; }
+  .gcard p{ font-size:14.5px; color:var(--slate); line-height:1.5; }
+
+  #institucional{ background:var(--white); }
+
+  /* ================= MODELO COLABORACION ================= */
+  #modelo{ background:var(--blue-deep); color:var(--white); }
+  #modelo .eyebrow{ color:var(--cyan); }
+  #modelo .sectionhead h2{ color:var(--white); }
+  .split-model{ margin-top:72px; display:grid; grid-template-columns:.9fr 1.6fr; gap:64px; align-items:center; }
+  @media (max-width:900px){ .split-model{ grid-template-columns:1fr; gap:48px; } }
+  .ratio-viz{ display:flex; flex-direction:column; gap:14px; }
+  .ratio-bar{ height:64px; display:flex; border-radius:2px; overflow:hidden; }
+  .ratio-fixed{ background:rgba(255,255,255,.14); width:0%; transition:width 1.4s var(--ease); display:flex; align-items:center; justify-content:center; }
+  .ratio-var{ background:var(--aurora); width:0%; transition:width 1.4s var(--ease) .15s; display:flex; align-items:center; justify-content:center; }
+  .ratio-bar span{ font-family:var(--font-mono); font-weight:600; font-size:15px; color:var(--white); }
+  .ratio-legend{ display:flex; justify-content:space-between; font-size:13px; color:var(--slate-soft); }
+  .feecols{ display:grid; grid-template-columns:repeat(2,1fr); gap:2px; background:rgba(255,255,255,.14); }
+  @media (max-width:560px){ .feecols{ grid-template-columns:1fr; } }
+  .feecell{ background:var(--blue-deep); padding:30px 26px; }
+  .feecell .when{ font-family:var(--font-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--cyan); }
+  .feecell h4{ font-size:20px; margin-top:10px; }
+  .feecell p{ margin-top:8px; font-size:14px; color:#C3D6EC; }
+
+  /* ================= ROADMAP ================= */
+  #roadmap{ background:var(--mist); }
+  .rm-track{ margin-top:72px; position:relative; }
+  .rm-bar{ position:relative; height:4px; background:var(--mist-deep); border-radius:2px; }
+  .rm-bar-fill{ position:absolute; left:0; top:0; height:100%; width:0%; background:var(--aurora); border-radius:2px; transition:width 1.6s var(--ease); }
+  .rm-cols{ margin-top:36px; display:grid; grid-template-columns:repeat(4,1fr); gap:28px; }
+  @media (max-width:900px){ .rm-cols{ grid-template-columns:1fr; } }
+  .rm-col .when{ font-family:var(--font-mono); font-size:12px; color:var(--blue); letter-spacing:.06em; }
+  .rm-col h4{ font-size:20px; margin-top:12px; }
+  .rm-col p{ margin-top:10px; font-size:14.5px; color:var(--slate); line-height:1.5; }
+
+  /* ================= INFO REQUERIDA ================= */
+  #info{ background:var(--white); }
+  .info-grid{ margin-top:60px; display:grid; grid-template-columns:repeat(2,1fr); gap:2px; background:var(--mist-deep); }
+  @media (max-width:760px){ .info-grid{ grid-template-columns:1fr; } }
+  .info-cell{ background:var(--mist); padding:34px 30px; }
+  .info-cell h4{ font-size:17px; color:var(--blue); }
+  .info-cell p{ margin-top:10px; font-size:14.5px; color:var(--slate); line-height:1.55; }
+
+  /* ================= CIERRE ================= */
+  #cierre{
+    background:var(--blue-deep); color:var(--white); padding:180px 0 90px;
+    position:relative; overflow:hidden;
+  }
+  #cierre::before{
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(60% 60% at 20% 20%, rgba(93,224,230,.22), transparent 65%);
+  }
+  .cierre-inner{ position:relative; z-index:2; }
+  .cierre-steps{ margin-top:64px; display:grid; grid-template-columns:repeat(4,1fr); gap:28px; }
+  @media (max-width:900px){ .cierre-steps{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:560px){ .cierre-steps{ grid-template-columns:1fr; } }
+  .cstep .n{ font-family:var(--font-mono); font-weight:600; font-size:34px; color:var(--cyan); }
+  .cstep p{ margin-top:14px; font-size:15px; color:#C3D6EC; line-height:1.5; }
+  .cierre-cta{
+    margin-top:96px; display:flex; justify-content:space-between; align-items:flex-end;
+    flex-wrap:wrap; gap:28px; border-top:1px solid rgba(255,255,255,.16); padding-top:40px;
+  }
+  .cierre-cta a.btn{
+    display:inline-flex; align-items:center; gap:10px; background:var(--aurora); color:var(--blue-deep);
+    font-family:var(--font-mono); font-weight:600; font-size:14px; padding:16px 26px; border-radius:2px;
+    text-decoration:none; transition:transform .3s var(--ease);
+  }
+  .cierre-cta a.btn:hover{ transform:translateY(-3px); }
+  .cierre-foot{ font-size:13px; color:var(--slate-soft); }
+
+  /* focus visibility for a11y */
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--cyan); outline-offset:3px; }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<nav id="dotnav" aria-label="Navegación de secciones">
+  <button data-target="#hero" aria-label="Inicio" class="active"></button>
+  <button data-target="#problema" aria-label="Diagnóstico"></button>
+  <button data-target="#oportunidad" aria-label="Oportunidad"></button>
+  <button data-target="#propuesta" aria-label="Propuesta"></button>
+  <button data-target="#marca" aria-label="Marca"></button>
+  <button data-target="#canales" aria-label="Ejecución"></button>
+  <button data-target="#roadmap" aria-label="Roadmap"></button>
+  <button data-target="#cierre" aria-label="Cierre"></button>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header id="hero">
+  <div class="wrap hero-top">
+    <div class="brandline">
+      <div class="cut-mark"></div>
+      <span class="eyebrow" style="color:#AFC3DC">COFUND.AR</span>
+    </div>
+    <span class="eyebrow" style="color:#AFC3DC">PARA HÜGA TECHNOLOGY</span>
+  </div>
+
+  <div class="wrap hero-mid">
+    <p class="eyebrow hero-kicker">Propuesta de desarrollo de negocios</p>
+    <h1 class="hero-title">
+      <span><b>Una tecnología.</b></span>
+      <span><b>Cuatro negocios.</b></span>
+      <span><b>Un solo cofundador.</b></span>
+    </h1>
+    <p class="hero-sub">Evolución de marca y estrategia comercial de Hüga hacia Home, Comercial, Industrial y Store — ejecutada junto a Cofund, no encargada a una consultora.</p>
+  </div>
+
+  <div class="wrap hero-bottom">
+    <div class="hero-meta">
+      <div><p>Presentado por</p><p>Cofund.ar</p></div>
+      <div><p>Presentado a</p><p>Hüga Technology</p></div>
+      <div><p>Alcance</p><p>Argentina, expansión multiprovincial</p></div>
+    </div>
+    <div class="scrollcue"><span class="eyebrow" style="font-size:11px">Scroll</span><div class="line"></div></div>
+  </div>
+</header>
+
+<!-- ================= PROBLEMA ================= -->
+<section id="problema" class="pad">
+  <div class="wrap">
+    <div class="sectionhead reveal">
+      <p class="eyebrow" style="color:var(--blue)">El diagnóstico</p>
+      <h2>Una tecnología ganadora, vendida como un solo negocio</h2>
+    </div>
+    <div class="cards3">
+      <div class="stat-card reveal">
+        <p class="num" data-count="4">0</p>
+        <p class="desc">lógicas de negocio distintas conviven hoy bajo un mismo mensaje: familias, empresas de retail, compañías industriales/mineras y clientes que ya recibieron su obra y necesitan equiparla.</p>
+      </div>
+      <div class="stat-card reveal">
+        <p class="num"><span data-count="70">0</span>%</p>
+        <p class="desc">de las mipymes de la región todavía no tiene presencia digital activa: una diferenciación inmediata para quien sí la resuelva.</p>
+      </div>
+      <div class="stat-card dark reveal">
+        <p class="num" data-count="1">0</p>
+        <p class="desc">sola marca, sin arquitectura, diluye el mensaje y alarga el ciclo de venta en los tres segmentos a la vez.</p>
+      </div>
+    </div>
+    <p class="source-note reveal">Fuente: CEPAL, 2024 — presencia digital de mipymes en la región. Análisis Cofund sobre material de Hüga.</p>
+  </div>
+</section>
+
+<!-- ================= QUIEN ES HUGA ================= -->
+<section id="huga" class="pad">
+  <div class="wrap">
+    <div class="sectionhead reveal">
+      <p class="eyebrow">Quién es Hüga hoy</p>
+      <h2>El problema más difícil ya está resuelto</h2>
+    </div>
+    <p class="lead reveal">Construcción off-site con moldes 3D y hormigón armado: un módulo de 25,92 m² por día por línea, 95% construido fuera de sitio, apilable hasta 3 niveles, resistente a sismos y climas extremos.</p>
+    <div class="statrow">
+      <div class="statcell reveal"><p class="num" data-count="80" data-prefix="+">0</p><p class="lbl">años de trayectoria constructiva off-site, desde 1943</p></div>
+      <div class="statcell reveal"><p class="num" data-count="2000" data-prefix="+">0</p><p class="lbl">viviendas entregadas en Argentina</p></div>
+      <div class="statcell reveal"><p class="num" data-count="750" data-prefix="+" data-suffix="K">0</p><p class="lbl">m² construidos en arquitectura residencial e industrial</p></div>
+      <div class="statcell reveal"><p class="num" data-count="70" data-suffix="%">0</p><p class="lbl">menos tiempo de obra frente a la construcción tradicional</p></div>
+    </div>
+    <p class="huga-award reveal">Primer Global Innovation Award otorgado por la NAHB (Orlando). Tecnología ya aplicada a vivienda, comercio, industria, minería, turismo, educación y salud.</p>
+  </div>
+</section>
+
+<!-- ================= OPORTUNIDAD ================= -->
+<section id="oportunidad" class="pad">
+  <div class="wrap">
+    <div class="sectionhead reveal">
+      <p class="eyebrow" style="color:var(--blue)">El mercado</p>
+      <h2>Tres oportunidades, tres argumentos de compra distintos</h2>
+    </div>
+    <div class="opp-list">
+      <div class="opp-row reveal">
+        <p class="tag">Vivienda</p>
+        <h3>Certeza de plazos, en un mercado que recién reactiva el crédito</h3>
+        <p>Argentina arrastra un déficit habitacional estructural. La construcción industrializada reduce el riesgo de obra frente al método tradicional — un argumento directo para developers, cooperativas y familias.</p>
+      </div>
+      <div class="opp-row reveal">
+        <p class="tag">Comercial</p>
+        <h3>Cada día de local cerrado es facturación perdida</h3>
+        <p>Retail, franquicias y bancos necesitan velocidad de apertura y costos previsibles. Un local llave en mano en semanas, no en meses, es un argumento que se mide en ROI.</p>
+      </div>
+      <div class="opp-row reveal">
+        <p class="tag">Industrial · Minero</p>
+        <h3>Infraestructura donde la obra tradicional no llega a tiempo</h3>
+        <p>Minería e industria en expansión (Catamarca, San Juan, Salta, Jujuy, Neuquén) necesitan montaje rápido en zonas remotas. Hüga ya tiene producto desarrollado para este uso.</p>
+      </div>
+      <div class="opp-row reveal">
+        <p class="tag">Store</p>
+        <h3>Un gasto que el cliente ya hace, hoy fuera de la marca</h3>
+        <p>Cada entrega genera una necesidad inmediata de terminaciones, muebles y decoración que Hüga hoy no captura. Un ingreso de intermediación sin inversión productiva adicional.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROPUESTA (statement) ================= -->
+<section id="propuesta">
+  <div class="wrap">
+    <p class="eyebrow reveal" style="color:var(--cyan)">La propuesta</p>
+    <h2 class="statement reveal" style="margin-top:22px">Cofund se suma como <em>cofundador de ejecución</em>, no como consultora.</h2>
+    <p class="statement-cap reveal">Un líder de proyecto que arranca part-time y escala su dedicación junto con el negocio, respaldado por una red de expertos en estrategia, tecnología, marketing, finanzas, legal e ingeniería — con IA integrada en cada etapa, desde el diagnóstico hasta el seguimiento en tiempo real.</p>
+  </div>
+</section>
+
+<!-- ================= ETAPAS ================= -->
+<section id="etapas" class="pad">
+  <div class="wrap">
+    <div class="sectionhead reveal">
+      <p class="eyebrow" style="color:var(--blue)">Cómo trabajamos</p>
+      <h2>Tres etapas, un solo equipo</h2>
+    </div>
+    <div class="timeline" id="timelineEl">
+      <div class="timeline-line"></div>
+      <div class="timeline-fill" id="timelineFill"></div>
+      <div class="tstep reveal"><div class="dot">01</div><h3>Evaluación inicial con IA</h3><p>Diagnóstico del estado comercial real de cada unidad: leads, canales, funnel, capacidad productiva y prioridades, junto al equipo de Hüga.</p></div>
+      <div class="tstep reveal"><div class="dot">02</div><h3>Plan de acción inteligente</h3><p>Hitos, recursos y escenarios proyectados con IA para marca, canales digitales y vinculación institucional de las tres unidades.</p></div>
+      <div class="tstep reveal"><div class="dot">03</div><h3>Ejecución y acompañamiento</h3><p>Cofund monitorea el avance en tiempo real y ajusta el rumbo junto a Hüga, reportando resultados comerciales concretos.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DEDICACION ESCALONADA ================= -->
+<section id="dedicacion" class="pad" style="background:var(--white)">
+  <div class="wrap">
+    <div class="sectionhead reveal">
+      <p class="eyebrow" style="color:var(--blue)">Cómo nos involucramos</p>
+      <h2 style="color:var(--blue-deep)">Part-time hoy, full-time cuando el negocio lo pida</h2>
+    </div>
+    <p class="reveal" style="margin-top:22px; max-width:680px; color:var(--slate); font-size:16.5px">Cofund no instala una estructura de costo fijo completa desde el primer día. La dedicación del líder de proyecto arranca part-time, con foco en lo que más rápido genera tracción — vinculación institucional y desarrollo de canales digitales — y escala a medida que el pipeline y los resultados lo justifican.</p>
+    <div class="rm-track reveal" id="dedTrack" style="margin-top:56px">
+      <div class="rm-bar"><div class="rm-bar-fill" id="dedFill"></div></div>
+      <div class="rm-cols">
+        <div class="rm-col"><p class="when">Meses 1–2</p><h4>Part-time (≈15–20 hs/sem)</h4><p>Diagnóstico inicial, arquitectura de marca, primeros vínculos institucionales y arranque de los canales digitales base.</p></div>
+        <div class="rm-col"><p class="when">Meses 3–5</p><h4>Part-time ampliado (≈25–30 hs/sem)</h4><p>Profundización de canales digitales (sitio, CRM, contenido) y consolidación de vínculos institucionales por unidad.</p></div>
+        <div class="rm-col"><p class="when">Meses 6–8</p><h4>Medio tiempo</h4><p>Lanzamiento comercial de las unidades de obra y piloto de proveedores de Hüga Store.</p></div>
+        <div class="rm-col"><p class="when">Meses 9 en adelante</p><h4>Full-time o squad dedicado</h4><p>Según volumen validado: coordinación diaria de las cuatro unidades, expansión multiprovincial y optimización por datos.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MARCA ================= -->
+<section id="marca" class="pad">
+  <div class="wrap">
+    <div class="sectionhead reveal">
+      <p class="eyebrow">Arquitectura de marca</p>
+      <h2>Una marca madre, cuatro voces propias</h2>
+    </div>
+    <p class="lead reveal" style="margin-top:20px; color:#C3D6EC; max-width:680px">Hüga conserva la garantía técnica y la trayectoria; cada unidad habla el idioma de su comprador.</p>
+    <div class="brandtable reveal">
+      <div class="brand-row head">
+        <span>Unidad</span><span>A quién le habla</span><span>Promesa central</span><span>Tono</span>
+      </div>
+      <div class="brand-row r-home">
+        <span class="name">Hüga Home</span>
+        <p>Familias, inversores, cooperativas</p>
+        <p>Tu casa, con la certeza de una fábrica</p>
+        <p>Cálido, cercano</p>
+      </div>
+      <div class="brand-row r-com">
+        <span class="name">Hüga Comercial</span>
+        <p>Retail, franquicias, bancos</p>
+        <p>Abrí en semanas, no en meses</p>
+        <p>Ágil, ejecutivo</p>
+      </div>
+      <div class="brand-row r-ind">
+        <span class="name">Hüga Industrial</span>
+        <p>Industria, logística, minería</p>
+        <p>Infraestructura donde nadie más llega a tiempo</p>
+        <p>Técnico, robusto</p>
+      </div>
+      <div class="brand-row r-store">
+        <span class="name">Hüga Store</span>
+        <p>Clientes en etapa de mudanza, marcas y proveedores aliados</p>
+        <p>Tu casa lista para vivir, con la misma curaduría que la construyó</p>
+        <p>Curado, inspiracional</p>
+      </div>
+    </div>
+    <p class="brandnote reveal">Identidad visual definitiva sujeta al manual de marca vigente de Hüga, o a definirlo desde cero junto con la identidad de las tres sub-marcas.</p>
+  </div>
+</section>
+
+<!-- ================= HUGA HOME ================= -->
+<section id="home" class="unit">
+  <div class="wrap">
+    <div class="unit-head reveal"><h2>Hüga Home</h2><span class="tag2">Desarrollo de viviendas familiares</span></div>
+    <div class="unit-grid reveal-scale">
+      <div class="unit-col">
+        <h4>A quién le vendemos</h4>
+        <ul>
+          <li>Familias en búsqueda de primera vivienda o ampliación</li>
+          <li>Inversores particulares de proyectos build-to-rent</li>
+          <li>Cooperativas y programas de vivienda social</li>
+          <li>Segunda vivienda y turismo residencial</li>
+        </ul>
+      </div>
+      <div class="unit-col">
+        <h4>Argumento de venta</h4>
+        <ul>
+          <li>70% menos plazo de obra, con fecha contractual</li>
+          <li>Precio cerrado desde el pozo, sin sorpresas</li>
+          <li>Catálogo de tipologías M1 a M7</li>
+          <li>Eficiencia energética como diferencial normativo</li>
+        </ul>
+      </div>
+      <div class="unit-col">
+        <h4>Canal comercial</h4>
+        <ul>
+          <li>Simulador de cotización y configurador online</li>
+          <li>Alianzas con desarrolladores de loteos</li>
+          <li>Convenios de crédito con bancos y financieras</li>
+          <li>Showroom físico itinerante como cierre</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HUGA COMERCIAL ================= -->
+<section id="comercial" class="unit">
+  <div class="wrap">
+    <div class="unit-head reveal"><h2>Hüga Comercial</h2><span class="tag2">Desarrollo de locales comerciales</span></div>
+    <div class="unit-grid reveal-scale">
+      <div class="unit-col">
+        <h4>A quién le vendemos</h4>
+        <ul>
+          <li>Cadenas de retail y franquicias en expansión</li>
+          <li>Bancos y entidades financieras</li>
+          <li>Desarrolladores de paseos comerciales</li>
+          <li>Operadores de estaciones de servicio y rutas</li>
+        </ul>
+      </div>
+      <div class="unit-col">
+        <h4>Argumento de venta</h4>
+        <ul>
+          <li>Apertura en semanas: cada día cerrado es facturación perdida</li>
+          <li>Imagen de marca replicable en cada punto de venta</li>
+          <li>Escalable a 5, 10 o 20 locales por año</li>
+        </ul>
+      </div>
+      <div class="unit-col">
+        <h4>Canal comercial</h4>
+        <ul>
+          <li>Venta consultiva B2B a gerencias de expansión</li>
+          <li>Presencia en ferias y cámaras de retail</li>
+          <li>Calculadora de ROI por velocidad de apertura</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HUGA INDUSTRIAL ================= -->
+<section id="industrial" class="unit">
+  <div class="wrap">
+    <div class="unit-head reveal"><h2>Hüga Industrial</h2><span class="tag2">Galpones e infraestructura para industria y minería</span></div>
+    <div class="unit-grid reveal-scale">
+      <div class="unit-col">
+        <h4>A quién le vendemos</h4>
+        <ul>
+          <li>Mineras: campamentos, oficinas técnicas, enfermería</li>
+          <li>Industria y logística: naves y galpones</li>
+          <li>Energía: instalaciones en sitios remotos</li>
+        </ul>
+      </div>
+      <div class="unit-col">
+        <h4>Argumento de venta</h4>
+        <ul>
+          <li>Instalación remota con mínima mano de obra especializada</li>
+          <li>Resistencia sísmica y climas extremos: cordillera y puna</li>
+          <li>Catálogo modular ya desarrollado para campamentos</li>
+        </ul>
+      </div>
+      <div class="unit-col">
+        <h4>Canal comercial</h4>
+        <ul>
+          <li>Venta directa a gerencias de proyecto minero/industrial</li>
+          <li>Vinculación con CAEM y cámaras mineras provinciales</li>
+          <li>Alianzas con EPCistas y contratistas generales</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HUGA STORE ================= -->
+<section id="store" class="unit" style="background:var(--mist)">
+  <div class="wrap">
+    <div class="unit-head reveal"><h2 style="color:var(--blue-deep)">Hüga Store</h2><span class="tag2">Red de proveedores para equipamiento y terminación</span></div>
+    <p class="reveal" style="margin-top:20px; max-width:680px; color:var(--slate); font-size:16px">A diferencia de las otras tres unidades, Store no construye: cura y conecta. Un marketplace de proveedores aliados que captura el gasto que el cliente de Hüga ya hace, en el momento exacto en que recibe las llaves.</p>
+    <div class="unit-grid reveal-scale" style="margin-top:40px">
+      <div class="unit-col" style="background:var(--white)">
+        <h4>A quién le vendemos</h4>
+        <ul>
+          <li>Clientes de Hüga Home en etapa de mudanza</li>
+          <li>Clientes de Hüga Comercial equipando un local nuevo</li>
+          <li>Marcas y proveedores locales: muebles, IoT, decoración, vivero</li>
+        </ul>
+      </div>
+      <div class="unit-col" style="background:var(--white)">
+        <h4>Argumento de venta</h4>
+        <ul>
+          <li>Catálogo curado, con la misma confianza con la que se construyó la obra</li>
+          <li>Ingreso de intermediación sin inversión productiva adicional</li>
+          <li>Acceso directo a una demanda calificada para cada proveedor aliado</li>
+        </ul>
+      </div>
+      <div class="unit-col" style="background:var(--white)">
+        <h4>Canal comercial</h4>
+        <ul>
+          <li>Marketplace digital integrado al CRM, activado en la entrega</li>
+          <li>Programa de proveedores certificados Hüga Store</li>
+          <li>Espacio físico dentro del showroom de Hüga Home</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CANALES DIGITALES ================= -->
+<section id="canales" class="pad">
+  <div class="wrap">
+    <div class="sectionhead reveal">
+      <p class="eyebrow" style="color:var(--blue)">Ejecución digital</p>
+      <h2>Un ecosistema, tres verticales</h2>
+    </div>
+    <div class="grid4">
+      <div class="gcard reveal"><div class="mark"></div><h4>Sitio y arquitectura digital</h4><p>Home corporativa + 3 landings verticales, configurador de cotización, calculadora de ROI y CRM unificado con scoring de leads.</p></div>
+      <div class="gcard reveal"><div class="mark"></div><h4>Contenido y SEO</h4><p>Palabras clave diferenciadas por vertical, banco de casos con métricas reales, contenido técnico B2B y contenido inspiracional para Home.</p></div>
+      <div class="gcard reveal"><div class="mark"></div><h4>Redes y performance</h4><p>LinkedIn para Comercial e Industrial, Instagram/Meta para Home, pauta segmentada y WhatsApp Business integrado al CRM.</p></div>
+      <div class="gcard reveal"><div class="mark"></div><h4>Datos e IA aplicada</h4><p>Tablero de indicadores en tiempo real por unidad, calificación automática de leads y priorización de oportunidades.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VINCULACION INSTITUCIONAL ================= -->
+<section id="institucional" class="pad">
+  <div class="wrap">
+    <div class="sectionhead reveal">
+      <p class="eyebrow" style="color:var(--blue)">Posicionamiento</p>
+      <h2>Vinculación institucional por segmento</h2>
+    </div>
+    <div class="grid4">
+      <div class="gcard reveal"><div class="mark"></div><h4>Vivienda y sector público</h4><p>Institutos de vivienda provinciales y municipales, cooperativas y mutuales, para licitaciones de vivienda social.</p></div>
+      <div class="gcard reveal"><div class="mark"></div><h4>Comercial y financiero</h4><p>Cámaras de franquicias y retail, ferias sectoriales, convenios de crédito con bancos y financieras.</p></div>
+      <div class="gcard reveal"><div class="mark"></div><h4>Industria y minería</h4><p>CAEM y cámaras mineras provinciales, ferias del sector, alianzas con EPCistas y contratistas generales.</p></div>
+      <div class="gcard reveal"><div class="mark"></div><h4>Posicionamiento sectorial</h4><p>Aprovechar el premio NAHB, IBS Orlando y la red internacional de Hüga para PR especializado.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MODELO COLABORACION ================= -->
+<section id="modelo" class="pad">
+  <div class="wrap">
+    <div class="sectionhead reveal">
+      <p class="eyebrow">Modelo de colaboración</p>
+      <h2>Un esquema de pago que crece con el negocio</h2>
+    </div>
+    <div class="split-model">
+      <div class="ratio-viz reveal">
+        <div class="ratio-bar">
+          <div class="ratio-fixed" id="ratioFixed"><span>20%</span></div>
+          <div class="ratio-var" id="ratioVar"><span>80%</span></div>
+        </div>
+        <div class="ratio-legend"><span>Fee fijo — base operativa</span><span>Success fee · revenue share · equity</span></div>
+      </div>
+      <div class="feecols reveal">
+        <div class="feecell"><p class="when">Desde el día uno</p><h4>Fee fijo</h4><p>Cubre la dedicación del equipo Cofund y los costos operativos de ejecución.</p></div>
+        <div class="feecell"><p class="when">Por hito cumplido</p><h4>Success fee</h4><p>Se activa al lanzar cada unidad de negocio o al alcanzar metas definidas en conjunto.</p></div>
+        <div class="feecell"><p class="when">Por crecimiento</p><h4>Revenue share</h4><p>Porcentaje sobre los ingresos incrementales de las nuevas líneas comerciales.</p></div>
+        <div class="feecell"><p class="when">Largo plazo</p><h4>Equity</h4><p>Participación opcional de Cofund, alineada a construir valor junto a Hüga.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ROADMAP ================= -->
+<section id="roadmap" class="pad">
+  <div class="wrap">
+    <div class="sectionhead reveal">
+      <p class="eyebrow" style="color:var(--blue)">Hoja de ruta</p>
+      <h2>Dieciocho meses, cuatro fases</h2>
+    </div>
+    <div class="rm-track reveal" id="rmTrack">
+      <div class="rm-bar"><div class="rm-bar-fill" id="rmFill"></div></div>
+      <div class="rm-cols">
+        <div class="rm-col"><p class="when">Meses 1–2</p><h4>Diagnóstico y fundamentos</h4><p>Evaluación con IA, relevamiento comercial, arquitectura de marca y lineamientos visuales.</p></div>
+        <div class="rm-col"><p class="when">Meses 3–5</p><h4>Construcción</h4><p>Sitio multi-vertical, CRM, contenido inicial, material de venta y primeros contactos institucionales.</p></div>
+        <div class="rm-col"><p class="when">Meses 6–8</p><h4>Lanzamiento comercial</h4><p>Salida al mercado de las tres unidades de obra, campañas de performance, alianzas activas y primeros proveedores piloto de Store.</p></div>
+        <div class="rm-col"><p class="when">Meses 9–18</p><h4>Escalamiento</h4><p>Optimización por datos, expansión multiprovincial, escalado de la red de proveedores de Store y nuevas líneas: turismo, educación, salud.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= INFO REQUERIDA ================= -->
+<section id="info" class="pad">
+  <div class="wrap">
+    <div class="sectionhead reveal">
+      <p class="eyebrow" style="color:var(--blue)">Antes de arrancar</p>
+      <h2>Lo que necesitamos de Hüga</h2>
+    </div>
+    <div class="info-grid reveal">
+      <div class="info-cell"><h4>Comercial y financiero</h4><p>Estructura de ventas actual, volumen de leads, precios de referencia por m² y presupuesto de marketing disponible.</p></div>
+      <div class="info-cell"><h4>Producción y capacidad</h4><p>Capacidad disponible por línea y plazos de entrega reales, para calibrar la promesa comercial de cada unidad.</p></div>
+      <div class="info-cell"><h4>Marca y contenido</h4><p>Manual de marca vigente (o autorización para crearlo) y banco de imágenes y casos de proyectos entregados.</p></div>
+      <div class="info-cell"><h4>Institucional y gobernanza</h4><p>Vínculos ya iniciados, prioridades geográficas y referente de Hüga para el seguimiento semanal.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CIERRE ================= -->
+<section id="cierre">
+  <div class="wrap cierre-inner">
+    <p class="eyebrow reveal" style="color:var(--cyan)">Próximos pasos</p>
+    <div class="cierre-steps">
+      <div class="cstep reveal"><p class="n">01</p><p>Reunión de alineación entre equipos de Hüga y Cofund para validar alcance y prioridades.</p></div>
+      <div class="cstep reveal"><p class="n">02</p><p>Hüga comparte la información comercial, técnica y de marca detallada en esta propuesta.</p></div>
+      <div class="cstep reveal"><p class="n">03</p><p>Arranque de la Etapa 1: evaluación inicial potenciada por IA.</p></div>
+      <div class="cstep reveal"><p class="n">04</p><p>Plan de acción detallado, con cronograma fino y propuesta económica por unidad de negocio.</p></div>
+    </div>
+    <div class="cierre-cta reveal">
+      <div>
+        <h2 style="font-size:clamp(28px,3.6vw,44px)">New business, together.</h2>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px; align-items:flex-end">
+        <a class="btn" href="mailto:seba@cofund.ar">seba@cofund.ar</a>
+        <p class="cierre-foot">+54 9 3564 604701 · Cofund.ar — Buenos Aires, Argentina</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  // ---------- scroll progress ----------
+  var progress = document.getElementById('progress');
+  function updateProgress(){
+    var h = document.documentElement;
+    var scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    progress.style.width = scrolled + '%';
+  }
+  document.addEventListener('scroll', updateProgress, { passive:true });
+  updateProgress();
+
+  // ---------- reveal on scroll ----------
+  var revealEls = document.querySelectorAll('.reveal, .reveal-scale');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold:0.15, rootMargin:'0px 0px -60px 0px' });
+  revealEls.forEach(function(el){ io.observe(el); });
+
+  // ---------- animated counters ----------
+  var counters = document.querySelectorAll('[data-count]');
+  var counterIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(!entry.isIntersecting) return;
+      var el = entry.target;
+      counterIO.unobserve(el);
+      var target = parseInt(el.getAttribute('data-count'), 10);
+      var prefix = el.getAttribute('data-prefix') || '';
+      var suffix = el.getAttribute('data-suffix') || '';
+      var dur = 1300;
+      var start = null;
+      function step(ts){
+        if(!start) start = ts;
+        var p = Math.min((ts - start) / dur, 1);
+        var eased = 1 - Math.pow(1 - p, 3);
+        var val = Math.floor(eased * target);
+        el.textContent = prefix + val + suffix;
+        if(p < 1){ requestAnimationFrame(step); } else { el.textContent = prefix + target + suffix; }
+      }
+      requestAnimationFrame(step);
+    });
+  }, { threshold:0.5 });
+  counters.forEach(function(el){ counterIO.observe(el); });
+
+  // ---------- timeline fill (etapas) ----------
+  var timelineEl = document.getElementById('timelineEl');
+  var timelineFill = document.getElementById('timelineFill');
+  var timelineIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        timelineFill.style.height = timelineEl.offsetHeight - 28 + 'px';
+        timelineIO.unobserve(timelineEl);
+      }
+    });
+  }, { threshold:0.3 });
+  if(timelineEl){ timelineIO.observe(timelineEl); }
+
+  // ---------- ratio bar (modelo) ----------
+  var ratioFixed = document.getElementById('ratioFixed');
+  var ratioVar = document.getElementById('ratioVar');
+  var ratioIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        ratioFixed.style.width = '20%';
+        ratioVar.style.width = '80%';
+        ratioIO.unobserve(e.target);
+      }
+    });
+  }, { threshold:0.4 });
+  if(ratioFixed){ ratioIO.observe(ratioFixed); }
+
+  // ---------- roadmap fill ----------
+  var rmTrack = document.getElementById('rmTrack');
+  var rmFill = document.getElementById('rmFill');
+  var rmIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ rmFill.style.width = '100%'; rmIO.unobserve(e.target); }
+    });
+  }, { threshold:0.3 });
+  if(rmTrack){ rmIO.observe(rmTrack); }
+
+  // ---------- dedicacion escalonada fill ----------
+  var dedTrack = document.getElementById('dedTrack');
+  var dedFill = document.getElementById('dedFill');
+  var dedIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ dedFill.style.width = '100%'; dedIO.unobserve(e.target); }
+    });
+  }, { threshold:0.3 });
+  if(dedTrack){ dedIO.observe(dedTrack); }
+
+  // ---------- dot nav: click + active state ----------
+  var dots = document.querySelectorAll('#dotnav button');
+  dots.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var target = document.querySelector(btn.getAttribute('data-target'));
+      if(target){ target.scrollIntoView({ behavior:'smooth' }); }
+    });
+  });
+  var navMap = {};
+  dots.forEach(function(btn){ navMap[btn.getAttribute('data-target').slice(1)] = btn; });
+  var navSections = Object.keys(navMap).map(function(id){ return document.getElementById(id); }).filter(Boolean);
+  var navIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        dots.forEach(function(d){ d.classList.remove('active'); });
+        navMap[e.target.id].classList.add('active');
+      }
+    });
+  }, { threshold:0.5 });
+  navSections.forEach(function(s){ navIO.observe(s); });
+})();
+</script>
+</body>
+</html>
